@@ -1,0 +1,49 @@
+
+inverter:
+  serial: 1234567890  # WiFi stick serial number
+  ip: "192.168.1.99"  # IP address of inverter
+  port: 8899  # Port number
+modbus:
+  - address: 500
+    prom_metric: 'bus_voltage'
+    label: 'Bus Voltage'
+  - address: 501
+    prom_metric: 'negative_bus_voltage'
+    label: 'Negative Bus Voltage'
+  - address: 502
+    prom_metric: 'insulation_resistance_value'
+    label: 'Insulation resistance value'
+  - address: 503
+    prom_metric: 'insulation_resistance_value'
+    label: 'Insulation resistance value'
+  - address: 504
+    prom_metric: 'leakage_current_effective_value'
+    label: 'Leakage current effective value'
+  - address: 505
+    prom_metric: 'dci_in_s_phase'
+    label: 'DCI in S phase'
+  - address: 553
+    prom_metric: 'pv_total_power'
+    label: 'PV Total Power'
+    multi: true
+  - address: 554
+    prom_metric: 'pv_total_power'
+    label: 'PV Total Power'
+    multi: true
+  - address: 1000
+    prom_metric: 'e_inverter_out_today'
+    label: 'E-today'
+  - address: 1001
+    prom_metric: 'e_inverter_in_today'
+    label: 'Etoday received from grid by inverter'
+  - address: 1002
+    prom_metric: 'e_to_grid'
+    label: 'Etoday feed into grid'
+  - address: 1006
+    prom_metric: 'epvday'
+    label: 'EPVDay'
+    multi: true
+  - address: 1007
+    prom_metric: 'epvday'
+    label: 'EPVDay'
+    multi: true
