@@ -5,9 +5,11 @@ from asyncio import AbstractEventLoop
 from os.path import expanduser
 
 import loguru
+from aiohttp import web
 from ruamel.yaml import YAML
 
 from afore_local_exporter.config import AforeLocalConfig
+from afore_local_exporter.http_server import AforeHttpServer
 from afore_local_exporter.modbus import AforeModbus
 
 if __name__ == '__main__':
@@ -25,11 +27,10 @@ if __name__ == '__main__':
         config = AforeLocalConfig(**d)
 
     modbus = AforeModbus(config=config)
-    modbus.connect()
-    registers = modbus.query_registers()
-    print(registers)
 
+    http_server = AforeHttpServer(modbus=modbus, config=config)
+    app = web.Application()
+    app.router.add_get('/api/registers', http_server.get_registers)
+    app.router.add_get('/metrics', http_server.get_metrics)
 
-    loop = asyncio.new_event_loop()
-
-    loop.run_forever()
+    web.run_app(app, port=args.http_port)

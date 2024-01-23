@@ -4,46 +4,209 @@ inverter:
   ip: "192.168.1.99"  # IP address of inverter
   port: 8899  # Port number
 modbus:
-  - address: 500
-    prom_metric: 'bus_voltage'
-    label: 'Bus Voltage'
-  - address: 501
-    prom_metric: 'negative_bus_voltage'
-    label: 'Negative Bus Voltage'
-  - address: 502
-    prom_metric: 'insulation_resistance_value'
-    label: 'Insulation resistance value'
-  - address: 503
-    prom_metric: 'insulation_resistance_value'
-    label: 'Insulation resistance value'
-  - address: 504
-    prom_metric: 'leakage_current_effective_value'
-    label: 'Leakage current effective value'
-  - address: 505
-    prom_metric: 'dci_in_s_phase'
-    label: 'DCI in S phase'
+  - address: 515
+    key: 't_phase_grid_frequency'
+    label: 'T phase grid frequency'
+  - address: 516
+    key: 'a_phase_active_power'
+    label: 'A phase active power'
+    multi: true
+  - address: 517
+    key: 'a_phase_active_power'
+    label: 'A phase active power'
+    multi: true
+  - address: 518
+    key: 'b_phase_active_power'
+    label: 'B phase active power'
+    multi: true
+  - address: 519
+    key: 'b_phase_active_power'
+    label: 'B phase active power'
+    multi: true
+  - address: 520
+    key: 'c_phase_active_power'
+    label: 'C phase active power'
+    multi: true
+  - address: 521
+    key: 'c_phase_active_power'
+    label: 'C phase active power'
+    multi: true
+  - address: 522
+    key: 'total_active_power'
+    label: 'Total active power'
+    multi: true
+  - address: 523
+    key: 'total_active_power'
+    label: 'Total active power'
+    multi: true
+  - address: 524
+    key: 'total_reactive_power'
+    label: 'Total reactive power'
+    multi: true
+  - address: 525
+    key: 'total_reactive_power'
+    label: 'Total reactive power'
+    multi: true
+  - address: 526
+    key: 'total_power_factor'
+    label: 'Total power factor'
+  - address: 527
+    key: 'total_apparent_power'
+    label: 'Total apparent power'
+    multi: true
+  - address: 528
+    key: 'total_apparent_power'
+    label: 'Total apparent power'
+    multi: true
+
+  - address: 529
+    key: 'r_phase_grid_connected_power_meter'
+    label: 'R-phase grid-connected power (meter)'
+    multi: true
+  - address: 530
+    key: 'r_phase_grid_connected_power_meter'
+    label: 'R-phase grid-connected power (meter)'
+    multi: true
+  - address: 531
+    key: 's_phase_grid_connected_power_meter'
+    label: 'S-phase grid-connected power (meter)'
+    multi: true
+  - address: 532
+    key: 's_phase_grid_connected_power_meter'
+    label: 'S-phase grid-connected power (meter)'
+    multi: true
+  - address: 533
+    key: 't_phase_grid_connected_power_meter'
+    label: 'T-phase grid-connected power (meter)'
+    multi: true
+  - address: 534
+    key: 't_phase_grid_connected_power_meter'
+    label: 'T-phase grid-connected power (meter)'
+    multi: true
+  - address: 535
+    key: 'total_grid_connected_active_power'
+    label: 'Total grid-connected active power'
+    multi: true
+  - address: 536
+    key: 'total_grid_connected_active_power'
+    label: 'Total grid-connected active power'
+    multi: true
+  - address: 537
+    key: 'total_grid_connected_reactive_power'
+    label: 'Total grid-connected reactive power'
+    multi: true
+  - address: 538
+    key: 'total_grid_connected_reactive_power'
+    label: 'Total grid-connected reactive power'
+    multi: true
+  - address: 539
+    key: 'total_grid_connected_apparent_power'
+    label: 'Total grid-connected apparent power'
+    multi: true
+  - address: 540
+    key: 'total_grid_connected_apparent_power'
+    label: 'Total grid-connected apparent power'
+    multi: true
+  - address: 547
+    key: 'total_load_active_power'
+    label: 'Total load active power'
+    multi: true
+  - address: 548
+    key: 'total_load_active_power'
+    label: 'Total load active power'
+    multi: true
   - address: 553
-    prom_metric: 'pv_total_power'
-    label: 'PV Total Power'
+    key: 'pv_total_power'
+    label: 'PV total power'
     multi: true
   - address: 554
-    prom_metric: 'pv_total_power'
-    label: 'PV Total Power'
+    key: 'pv_total_power'
+    label: 'PV total power'
     multi: true
+  - address: 555
+    key: 'pv1_voltage'
+    label: 'PV1 voltage'
+  - address: 556
+    key: 'pv1_current'
+    label: 'PV1 current'
+  - address: 557
+    key: 'pv1_power'
+    label: 'PV1 power'
+  - address: 558
+    key: 'pv2_voltage'
+    label: 'PV2 voltage'
+  - address: 559
+    key: 'pv2_current'
+    label: 'PV2 current'
+  - address: 560
+    key: 'pv2_power'
+    label: 'PV2 power'
+  - address: 561
+    key: 'pv3_voltage'
+    label: 'PV3 voltage'
+  - address: 562
+    key: 'pv3_current'
+    label: 'PV3 current'
+  - address: 563
+    key: 'pv3_power'
+    label: 'PV3 power'
+
+  - address: 564
+    key: 'pv4_voltage'
+    label: 'PV4 voltage'
+
+  - address: 565
+    key: 'pv4_current'
+    label: 'PV4 current'
+
+  - address: 566
+    key: 'pv4_power'
+    label: 'PV4 power'
+
+
   - address: 1000
-    prom_metric: 'e_inverter_out_today'
+    key: 'e_inverter_out_today'
     label: 'E-today'
   - address: 1001
-    prom_metric: 'e_inverter_in_today'
+    key: 'e_inverter_in_today'
     label: 'Etoday received from grid by inverter'
   - address: 1002
-    prom_metric: 'e_to_grid'
+    key: 'e_to_grid'
     label: 'Etoday feed into grid'
+#Etoday received from grid	EfromgridDay	1003	U16	2	 	0.1kwh	 	 	X	√	X	X
+#Etoday  to load	EtoLoadDay	1004	U16	2	 	0.1kwh	 	YES	X	√	X	X
+#Etoday from load	EfromLoadDay	1005	U16	2
   - address: 1006
-    prom_metric: 'epvday'
+    key: 'epvday'
     label: 'EPVDay'
     multi: true
   - address: 1007
-    prom_metric: 'epvday'
+    key: 'epvday'
     label: 'EPVDay'
     multi: true
+#PV1 Etoday 	EPV1Day	1008	U16	2	 	0.1kwh	 	YES	X	√	X	X
+#PV2 Etoday 	EPV2Day	1009	U16	2	 	0.1kwh	 	YES	X	√	X	X
+#PV3 Etoday 	EPV3Day	1010	U16	2	 	0.1kwh	 	YES	X	√	X	X
+#PV4 Etoday 	EPV4Day	1011	U16	2	 	0.1kwh	 	YES	X	√	X	X
+#Etotal by inverter	EInvOutTotal	1014-1015	U32	4	 	0.1kwh	 	YES	X	√	X	X
+#Etotal received by inverter from grid 	EInvRecTotal	1016-1017	U32	4	 	0.1kwh	 	YES	X	√	X	X
+#Etotal feed into grid	EtogridTotal	1018-1019	U32	4	 	0.1kwh	 	YES	X	√	X	X
+#Etotal received from grid	EfromgridTotal	1020-1021	U32	4	 	0.1kwh	 	 	X	√	X	X
+#Etotal to load	EtoLoadTotal	1022-1023	U32
+
+#Run status	RunState	2500	U16	2
+#Inverter inner temperature	Tinner	2514	S16	2	 	0.1℃	 	 	 	X	√	X	X
+# transformer temperature	Ttransf	2515	S16	2	 	0.1℃
+
+#PV error 1A182	PvErr1	3000-3001	U32	4	 	 	 	 	 	X	√	X	X
+#PV error 2	PvErr2	3002-3003	U32	4	 	 	 	 	 	X	√	X	X
+#grid error	GridErr	3008-3009	U32	4	 	 	 	 	 	X	√	X	X
+#off grid error	OffGridErr	3010-3011	U32	4	 	 	 	 	 	X	√	X	X
+#DC side error 1	DCErr1	3012-3013	U32	4	 	 	 	 	 	X	√	X	X
+#DC side error 2	DCErr2	3014-3015	U32	4	 	 	 	 	 	X	√	X	X
+#AC side error	ACErr	3016-3017	U32	4	 	 	 	 	 	X	√	X	X
+#system error1	SysErr1	3018-3019	U32	4	 	 	 	 	 	X	√	X	X
+#system error2	SysErr2	3020-3021	U32	4	 	 	 	 	 	X	√	X	X
+#permanent error 	PermErr	3022-3023	U32	4	 	 	 	 	 	X	√	X	X
+#innver warming	InWarning	3024-3025	U32	4	 	 	 	 	 	X	√	X	X
+#outer warming	OutWarning	3026-3027	U32	4

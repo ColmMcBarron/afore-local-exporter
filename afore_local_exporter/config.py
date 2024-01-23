@@ -4,9 +4,10 @@ from pydantic import BaseModel
 
 class ModbusConfig(BaseModel):
     address: int
-    prom_metric: str
+    key: str
     label: str
     multi: bool = False
+    unit: str = str('unknown')
 
 class InverterConfig(BaseModel):
     serial: int

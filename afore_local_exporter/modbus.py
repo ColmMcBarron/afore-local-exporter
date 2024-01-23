@@ -8,9 +8,14 @@ LOGGER = loguru.logger
 
 @dataclass
 class ModbusValue:
-    metric: str
-    label: str
+    key: str
     value: int
+
+    def to_dict(self) -> Dict:
+        return {
+            'key': self.key,
+            'value': self.value
+        }
 
 class AforeModbus:
 
@@ -49,38 +54,42 @@ class AforeModbus:
         try:
             LOGGER.info('Connecting to Modbus')
             self._modbus = PySolarmanV5(self._config.inverter.ip,
-                                  self._config.inverter.serial,
-                                  port=self._config.inverter.port,
-                                  mb_slave_id=1,
-                                  verbose=self._config.verbose)
+                                        self._config.inverter.serial,
+                                        port=self._config.inverter.port,
+                                        mb_slave_id=1,
+                                        verbose=self._config.verbose)
         except Exception as e:
             LOGGER.opt(exception=True).error('Unable to connect to modbus, try next time')
             self._modbus = None
 
-    def query_registers(self) -> Optional[List[Tuple[str, str, int]]]:
+    def query_registers(self) -> List[ModbusValue]:
         if not self._modbus:
             LOGGER.warning('unable to scrape this time, due to connection problem')
-            return None
+            return []
         registers = []
         multi_registers: Dict[str, List[ModbusValue]] = {}
         for bundle in self._address_bundles:
             regs = self._modbus.read_input_registers(register_addr=bundle[0], quantity=len(bundle))
+            LOGGER.info(f'query: {bundle[0]}: {len(bundle)}')
             for (idx, item) in enumerate(regs):
                 address = bundle[idx]
                 mbus = self._address_map[address]
                 if mbus.multi:
-                    if mbus.prom_metric not in multi_registers:
-                        multi_registers[mbus.prom_metric] = []
-                    multi_registers[mbus.prom_metric].append(ModbusValue(metric=mbus.prom_metric, label=mbus.label, value=item))
+                    if mbus.key not in multi_registers:
+                        multi_registers[mbus.key] = []
+                    multi_registers[mbus.key].append(ModbusValue(key=mbus.key, value=item))
                 else:
-                    registers.append(ModbusValue(metric=mbus.prom_metric, label=mbus.label, value=item))
+                    registers.append(ModbusValue(key=mbus.key, value=item))
 
-            for metric, mbus_list in multi_registers.items():
+            for k, mbus_list in multi_registers.items():
                 if len(mbus_list) == 1:
                     raise Exception('must have more than 1 multi modbus')
-                if len(mbus_list) == 2:
+                elif len(mbus_list) == 2:
+                    LOGGER.info(f'combining: {mbus_list}')
                     complete = mbus_list[1].value | (mbus_list[0].value << 16)
-                    registers.append(ModbusValue(metric=metric, label=mbus_list[0].label, value=complete))
+                    registers.append(ModbusValue(key=k, value=complete))
+                else:
+                    raise Exception('invalid number of registers')
 
         return registers
 
