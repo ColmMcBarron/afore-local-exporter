@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Dict, Optional, Tuple
 import loguru
-from pysolarmanv5 import PySolarmanV5
+from pysolarmanv5 import PySolarmanV5Async
 from .config import AforeLocalConfig, ModbusConfig
 
 LOGGER = loguru.logger
@@ -17,12 +17,25 @@ class ModbusValue:
             'value': self.value
         }
 
+@dataclass
+class RegistersData:
+    values: List[ModbusValue]
+    connection_error: bool
+    query_errors: int
+
+    def to_dict(self) -> Dict:
+        return {
+            'values': [v.to_dict() for v in self.values],
+            'connection_error': self.connection_error,
+            'query_errors': self.query_errors
+        }
+
 class AforeModbus:
 
     _config: AforeLocalConfig
     _address_bundles: List[List[int]]
     _address_map: Dict[int, ModbusConfig]
-    _modbus: Optional[PySolarmanV5]
+    _modbus: Optional[PySolarmanV5Async]
 
     def __init__(self, config: AforeLocalConfig):
         self._config = config
@@ -50,27 +63,43 @@ class AforeModbus:
         if address_bundle:
             self._address_bundles.append(address_bundle)
 
-    def connect(self) -> None:
+    async def connect(self) -> None:
         try:
             LOGGER.info('Connecting to Modbus')
-            self._modbus = PySolarmanV5(self._config.inverter.ip,
-                                        self._config.inverter.serial,
-                                        port=self._config.inverter.port,
-                                        mb_slave_id=1,
-                                        verbose=self._config.verbose)
+            self._modbus = PySolarmanV5Async(self._config.inverter.ip,
+                                             self._config.inverter.serial,
+                                             port=self._config.inverter.port,
+                                             mb_slave_id=1,
+                                             verbose=self._config.verbose,
+                                             auto_reconnect=True)
+            await self._modbus.connect()
         except Exception as e:
             LOGGER.opt(exception=True).error('Unable to connect to modbus, try next time')
             self._modbus = None
 
-    def query_registers(self) -> List[ModbusValue]:
+    async def disconnect(self):
+        if self._modbus is not None:
+            try:
+                await self._modbus.disconnect()
+            except Exception:
+                pass
+            finally:
+                self._modbus = None
+
+    async def query_registers(self) -> RegistersData:
         if not self._modbus:
             LOGGER.warning('unable to scrape this time, due to connection problem')
-            return []
-        registers = []
+            return RegistersData(values=[], connection_error=True, query_errors=0)
+        registers = RegistersData(values=[], connection_error=False, query_errors=0)
         multi_registers: Dict[str, List[ModbusValue]] = {}
         for bundle in self._address_bundles:
-            regs = self._modbus.read_input_registers(register_addr=bundle[0], quantity=len(bundle))
             LOGGER.info(f'query: {bundle[0]}: {len(bundle)}')
+            try:
+                regs = await self._modbus.read_input_registers(register_addr=bundle[0], quantity=len(bundle))
+            except Exception as e:
+                LOGGER.warning(f'unable to query registers for: {bundle[0]}:{len(bundle)} - {str(e)}')
+                registers.query_errors += 1
+                continue
             for (idx, item) in enumerate(regs):
                 address = bundle[idx]
                 mbus = self._address_map[address]
@@ -79,7 +108,7 @@ class AforeModbus:
                         multi_registers[mbus.key] = []
                     multi_registers[mbus.key].append(ModbusValue(key=mbus.key, value=item))
                 else:
-                    registers.append(ModbusValue(key=mbus.key, value=item))
+                    registers.values.append(ModbusValue(key=mbus.key, value=item))
 
             for k, mbus_list in multi_registers.items():
                 if len(mbus_list) == 1:
@@ -87,7 +116,7 @@ class AforeModbus:
                 elif len(mbus_list) == 2:
                     LOGGER.info(f'combining: {mbus_list}')
                     complete = mbus_list[1].value | (mbus_list[0].value << 16)
-                    registers.append(ModbusValue(key=k, value=complete))
+                    registers.values.append(ModbusValue(key=k, value=complete))
                 else:
                     raise Exception('invalid number of registers')
 
